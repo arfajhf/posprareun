@@ -65,8 +65,10 @@
         <form action="/laporan/pembelian/pertanggal/download" method="get" target="_blank">
             <input type="hidden" name="tanggal_awal" value="{{ $tanggal_awal }}">
             <input type="hidden" name="tanggal_akhir" value="{{ $tanggal_akhir }}">
+            <input type="hidden" name="supplier" value="{{ $supplier }}">
             <button type="submit">Download</button>
         </form>
+        {{-- @dd($supplier) --}}
         <h3>REKAPITULASI TRANSAKSI PEMBELIAN BARANG {{ $tanggal_awal1 }} SAMPAI {{ $tanggal_akhir1 }}</h3>
     </section>
 

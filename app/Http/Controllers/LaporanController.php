@@ -55,6 +55,7 @@ class LaporanController extends Controller
         $tanggal_awal1 = date('d-m-Y', strtotime($request->tanggal_awal));
         $tanggal_akhir1 = date('d-m-Y', strtotime($request->tanggal_akhir));
         $supplier = $request->supplier;
+        $this->pembelian_pertanggal_download($request, $supplier);
 
         $title = 'Pembelian';
         $pembelian = DB::table('pembelian')
@@ -65,7 +66,7 @@ class LaporanController extends Controller
             ->whereBetween('pembelian.created_at', [$tanggal_awal, $tanggal_akhir])
             ->where('detail_pembelian.supplier_id', $supplier)
             ->get();
-        return view('laporan.pembelian_pertanggal', compact('title', 'pembelian', 'tanggal_awal', 'tanggal_akhir', 'tanggal_awal1', 'tanggal_akhir1'));
+        return view('laporan.pembelian_pertanggal', compact('title', 'pembelian', 'tanggal_awal', 'tanggal_akhir', 'tanggal_awal1', 'tanggal_akhir1', 'supplier'));
     }
 
     public function pembelian_pertanggal_download(Request $request)
@@ -73,12 +74,14 @@ class LaporanController extends Controller
         $title = 'Pembelian';
         $tanggal_awal1 = date('d-m-Y', strtotime($request->tanggal_awal));
         $tanggal_akhir1 = date('d-m-Y', strtotime($request->tanggal_akhir));
+        $supplier = $request->supplier;
         $pembelian = DB::table('pembelian')
             ->join('detail_pembelian', 'pembelian.no_pembelian', 'detail_pembelian.no_pembelian')
             ->join('supplier', 'detail_pembelian.supplier_id', 'supplier.id')
             ->join('barang', 'pembelian.kode_barang', 'barang.kode_barang')
             ->select('pembelian.*', 'detail_pembelian.supplier_id', 'supplier.nama as nama_supplier', 'barang.nama_barang')
             ->whereBetween('pembelian.created_at', [$request->tanggal_awal, $request->tanggal_akhir])
+            ->where('detail_pembelian.supplier_id', $supplier)
             ->get();
         $pdf = PDF::loadView('laporan.pembelian_pertanggal_download', compact('title', 'pembelian', 'tanggal_awal1', 'tanggal_akhir1'))->setPaper('a4', 'landscape');
         return $pdf->download('REKAPITULASI-TRANSAKSI-PEMBELIAN-BARANG-' . date('d-m-Y', strtotime($request->tanggal_awal)) . '-SAMPAI-' . date('d-m-Y', strtotime($request->tanggal_akhir)) . '.pdf');
